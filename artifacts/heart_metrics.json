@@ -1,0 +1,49 @@
+{
+  "dataset": "UCI Cleveland Heart Disease (processed subset)",
+  "rows": 303,
+  "features": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "target_column": "num",
+  "target_mapping": "0 = target-negative; values above 0 = target-positive",
+  "model": "LogisticRegression with median imputation and StandardScaler",
+  "scikit_learn_version": "1.8.0",
+  "split": {
+    "train_samples": 227,
+    "test_samples": 76,
+    "test_size": 0.25,
+    "random_state": 42,
+    "stratified": true
+  },
+  "confusion_matrix": [
+    [
+      35,
+      6
+    ],
+    [
+      4,
+      31
+    ]
+  ],
+  "metrics": {
+    "accuracy": 0.868421052631579,
+    "balanced_accuracy": 0.8696864111498257,
+    "f1": 0.8611111111111112,
+    "precision": 0.8378378378378378,
+    "recall": 0.8857142857142857,
+    "roc_auc": 0.9282229965156794
+  },
+  "limitations": "Small historical educational dataset; metrics are from one holdout split and do not establish clinical validity. Not for diagnosis or patient-care decisions."
+}

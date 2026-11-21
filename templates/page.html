@@ -1,0 +1,63 @@
+{% extends "base.html" %}{% block content %}{% if page in ['overview','monitoring','screening','history','measurement-history','heart-model','platform'] %}<section class="welcome" id="overview">
+<div><div class="eyebrow">THURSDAY · HEALTH INTELLIGENCE</div><h1>{{ title }}<span class="period">.</span></h1><p>Your monitoring workspace for measurements, screening flags, and model service health.</p></div>
+<button class="button button-primary" onclick="window.location.href='/screening'"><span>＋</span> New measurement</button>
+</section>{% endif %}{% if page in ['overview','monitoring','screening'] %}<div class="notice"><span class="notice-icon">ⓘ</span><div><strong>Educational prototype — not a medical device</strong><p>Use synthetic/demo data only. Screening flags and model outputs are not diagnoses or medical advice.</p></div></div>{% endif %}{% if page in ['overview','monitoring'] %}<section class="metric-grid" id="monitoring">
+<article class="metric-card"><div class="metric-top"><span>HEART RATE</span><span class="metric-icon pink">♡</span></div><div class="metric-value" id="heartRate">— <small>bpm</small></div><div class="metric-foot"><span class="tiny-dot teal-dot"></span> Latest submitted value</div></article>
+<article class="metric-card"><div class="metric-top"><span>OXYGEN SATURATION</span><span class="metric-icon blue">◉</span></div><div class="metric-value" id="spo2">— <small>%</small></div><div class="metric-foot"><span class="tiny-dot teal-dot"></span> Latest submitted value</div></article>
+<article class="metric-card"><div class="metric-top"><span>TEMPERATURE</span><span class="metric-icon orange">♨</span></div><div class="metric-value" id="temperature">— <small>°C</small></div><div class="metric-foot"><span class="tiny-dot teal-dot"></span> Latest submitted value</div></article>
+<article class="metric-card"><div class="metric-top"><span>SCREENING FLAGS</span><span class="metric-icon violet">⚑</span></div><div class="metric-value" id="flagCount">0 <small>active</small></div><div class="metric-foot"><span id="flagCaption">Based on saved demo records</span></div></article>
+</section>{% endif %}{% if page in ['overview','measurement-history'] %}<section class="content-grid single-grid"><article class="panel chart-panel">
+<div class="panel-heading"><div><div class="eyebrow">OBSERVABILITY</div><h2>Measurement history</h2><p>Recent submitted measurements over time</p></div><span class="chart-legend"><i></i> Heart rate</span></div>
+<div class="chart-wrap"><canvas aria-label="Heart rate history chart" id="historyChart"></canvas><div class="empty-chart" id="chartEmpty">Submit a measurement to start building your history.</div></div>
+</article></section>{% endif %}{% if page in ['overview','screening'] %}<section class="content-grid single-grid"><article class="panel screening-panel" id="screening">
+<div class="panel-heading"><div><div class="eyebrow">DATA INPUT</div><h2>New measurement</h2><p>Enter demo readings below</p></div><span class="form-symbol">＋</span></div>
+<form id="measurementForm">
+<div class="form-grid">
+<label>Heart rate <span>bpm</span><input max="250" min="20" name="heart_rate_bpm" placeholder="e.g. 72" type="number"/></label>
+<label>SpO₂ <span>%</span><input max="100" min="50" name="spo2_percent" placeholder="e.g. 98" step="0.1" type="number"/></label>
+<label>Temperature <span>°C</span><input max="45" min="25" name="temperature_c" placeholder="e.g. 36.8" step="0.1" type="number"/></label>
+<label>Systolic BP <span>mmHg</span><input max="280" min="50" name="systolic_bp_mmhg" placeholder="e.g. 118" type="number"/></label>
+<label>Diastolic BP <span>mmHg</span><input max="180" min="30" name="diastolic_bp_mmhg" placeholder="e.g. 76" type="number"/></label>
+<label>Glucose <span>mg/dL</span><input max="800" min="20" name="glucose_mg_dl" placeholder="Optional" step="0.1" type="number"/></label>
+</div>
+<div class="form-actions"><span class="form-hint">Enter at least one value.</span><button class="button button-primary" id="submitBtn" type="submit">Save measurement <span>→</span></button></div>
+</form>
+<div aria-live="polite" class="form-result" id="formResult" role="status"></div>
+</article></section>{% endif %}{% if page in ['overview','history'] %}<section class="content-grid single-grid"><article class="panel table-panel">
+<div class="panel-heading"><div><div class="eyebrow">RECENT ACTIVITY</div><h2>Latest records</h2><p>Saved to the local demo database</p></div><button class="button button-quiet" id="refreshBtn">↻ Refresh</button></div>
+<div class="table-scroll"><table><thead><tr><th>TIME (UTC)</th><th>MEASUREMENTS</th><th>FLAGS</th></tr></thead><tbody id="historyBody"><tr><td class="empty-row" colspan="3">No records yet. Add a demo measurement.</td></tr></tbody></table></div>
+</article></section>{% endif %}{% if page in ['overview','platform'] %}<section class="content-grid single-grid"><article class="panel model-panel" id="platform">
+<div class="panel-heading"><div><div class="eyebrow">ML PLATFORM</div><h2>Model &amp; service status</h2><p>Live status from the API</p></div><span class="pulse"></span></div>
+<div class="model-status"><div class="model-symbol">✳</div><div class="model-copy"><strong>Heart risk model</strong><span id="modelStatus">Model artifact not loaded</span></div><span class="status-tag" id="modelTag">UNTRAINED</span></div>
+<div class="model-status"><div class="model-symbol purple-symbol">⌘</div><div class="model-copy"><strong>API service</strong><span id="readyStatus">Checking readiness</span></div><span class="status-tag green-tag" id="readyTag">CHECKING</span></div>
+<div class="observability-callout"><strong>Prometheus + Grafana ready</strong><p>API metrics are exposed at <code>/metrics</code>. Configure Prometheus to scrape the API and import the supplied Grafana dashboard.</p></div>
+</article></section>{% endif %}{% if page == 'heart-model' %}<section class="panel model-input-panel" id="heartModelDemo">
+<div class="panel-heading"><div><div class="eyebrow">MODEL INFERENCE DEMO</div><h2>Heart disease model</h2><p>Trained baseline using the included UCI Cleveland dataset. Evaluation details are shown below.</p></div><span class="form-symbol">✳</span></div>
+<div class="notice"><span class="notice-icon">ⓘ</span><div><strong id="heartTrainingStatus">Checking trained model status…</strong><p id="heartTrainingMessage">The application checks for the trained model artifact when this page loads. Use synthetic/demo data only; this prototype is not for clinical decisions.</p></div></div>
+<div class="metric-grid model-evaluation-grid">
+<article class="metric-card"><div class="metric-top"><span>HOLDOUT ACCURACY</span></div><div class="metric-value" id="heartAccuracy">—</div><div class="metric-foot">Single stratified test split</div></article>
+<article class="metric-card"><div class="metric-top"><span>BALANCED ACCURACY</span></div><div class="metric-value" id="heartBalancedAccuracy">—</div><div class="metric-foot">Class-balanced metric</div></article>
+<article class="metric-card"><div class="metric-top"><span>F1 SCORE</span></div><div class="metric-value" id="heartF1">—</div><div class="metric-foot">Positive-class F1</div></article>
+<article class="metric-card"><div class="metric-top"><span>ROC AUC</span></div><div class="metric-value" id="heartRocAuc">—</div><div class="metric-foot">Ranking metric on holdout split</div></article>
+</div>
+<p class="form-hint">Dataset: UCI Cleveland · 303 records · 13 input features · 75/25 stratified train/test split. These are educational holdout metrics, not clinical validation.</p>
+<form id="heartModelForm">
+<div class="form-grid">
+<label>Age <span>years</span><input max="120" min="1" name="age" placeholder="e.g. 52" required="" type="number"/></label>
+<label>Sex <select name="sex" required=""><option value="">Select sex</option><option value="0">Female</option><option value="1">Male</option></select></label>
+<label>Chest pain type <select name="cp" required=""><option value="">Select type</option><option value="1">Typical angina</option><option value="2">Atypical angina</option><option value="3">Non-anginal pain</option><option value="4">Asymptomatic</option></select></label>
+<label>Resting BP <span>mmHg</span><input max="300" min="50" name="trestbps" placeholder="e.g. 130" required="" type="number"/></label>
+<label>Cholesterol <span>mg/dL</span><input max="800" min="50" name="chol" placeholder="e.g. 230" required="" type="number"/></label>
+<label>Fasting blood sugar above 120 mg/dL <select name="fbs" required=""><option value="">Select result</option><option value="0">No</option><option value="1">Yes</option></select></label>
+<label>Resting ECG <select name="restecg" required=""><option value="">Select result</option><option value="0">Normal</option><option value="1">ST-T wave abnormality</option><option value="2">Left ventricular hypertrophy</option></select></label>
+<label>Max heart rate <span>bpm</span><input max="250" min="30" name="thalach" placeholder="e.g. 150" required="" type="number"/></label>
+<label>Exercise-induced angina <select name="exang" required=""><option value="">Select result</option><option value="0">No</option><option value="1">Yes</option></select></label>
+<label>ST depression <span>oldpeak</span><input max="10" min="0" name="oldpeak" placeholder="e.g. 1.0" required="" step="0.1" type="number"/></label>
+<label>ST segment slope <select name="slope" required=""><option value="">Select slope</option><option value="1">Upsloping</option><option value="2">Flat</option><option value="3">Downsloping</option></select></label>
+<label>Major vessels seen by fluoroscopy <select name="ca" required=""><option value="">Select count</option><option value="0">None (0)</option><option value="1">One vessel</option><option value="2">Two vessels</option><option value="3">Three vessels</option></select></label>
+<label>Thalassemia result <select name="thal" required=""><option value="">Select result</option><option value="3">Normal</option><option value="6">Fixed defect</option><option value="7">Reversible defect</option></select></label>
+</div>
+<div class="form-actions"><span class="form-hint" id="heartModelHint">Model is not trained. Inference is currently unavailable.</span><button class="button button-primary" id="heartModelBtn" type="submit" disabled>Model not trained</button></div>
+</form>
+<div aria-live="polite" class="form-result" id="heartModelResult" role="status"></div>
+</section>{% endif %}<footer><span>SMARTCARE MLOPS <span class="footer-sep">/</span> PORTFOLIO BUILD</span><span>Built for learning · Use synthetic data only</span></footer>{% endblock %}
