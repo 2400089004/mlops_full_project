@@ -28,7 +28,7 @@ def observe_request(response):
 
 @app.get("/")
 def dashboard():
-    return render_template("page.html", page="overview", title="Overview")
+    return render_template("index.html")
 
 @app.get("/monitoring")
 def patient_monitoring():
