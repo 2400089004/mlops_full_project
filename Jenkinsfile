@@ -3,22 +3,24 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = 'mlops_project'
-        IMAGE_TAG = 'latest'
+        IMAGE_NAME = 'smartcare-mlops'
+        IMAGE_TAG = 'v1'
+        CONTAINER_PORT = '3000'
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Checking out project source code'
+                echo 'Checking out SmartCare MLOps project'
                 checkout scm
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Python Setup') {
             steps {
                 sh '''
+                    python3 --version
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
@@ -36,24 +38,18 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
                 sh '''
-                    docker build -t ${APP_NAME}:${IMAGE_TAG} .
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
 
-        stage('Deploy Container') {
+        stage('Docker Image Verification') {
             steps {
                 sh '''
-                    docker rm -f ${APP_NAME} || true
-
-                    docker run -d \
-                      --name ${APP_NAME} \
-                      --restart unless-stopped \
-                      -p 5000:3000 \
-                      ${APP_NAME}:${IMAGE_TAG}
+                    docker images ${IMAGE_NAME}:${IMAGE_TAG}
                 '''
             }
         }
@@ -61,11 +57,11 @@ pipeline {
 
     post {
         success {
-            echo 'MLOps pipeline completed successfully!'
+            echo 'SmartCare MLOps CI pipeline completed successfully!'
         }
 
         failure {
-            echo 'MLOps pipeline failed. Check the console output.'
+            echo 'Pipeline failed. Check the stage logs.'
         }
 
         always {
